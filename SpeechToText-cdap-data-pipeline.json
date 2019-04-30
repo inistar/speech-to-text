@@ -1,0 +1,157 @@
+{
+    "name": "SpeechToText",
+    "description": "Data Pipeline Application",
+    "artifact": {
+        "name": "cdap-data-pipeline",
+        "version": "6.0.0",
+        "scope": "SYSTEM"
+    },
+    "config": {
+        "resources": {
+            "memoryMB": 2048,
+            "virtualCores": "2"
+        },
+        "driverResources": {
+            "memoryMB": 2048,
+            "virtualCores": "2"
+        },
+        "connections": [
+            {
+                "from": "Audio Data",
+                "to": "Google Cloud Speech-to-Text"
+            },
+            {
+                "from": "Google Cloud Speech-to-Text",
+                "to": "Text Data"
+            }
+        ],
+        "comments": [],
+        "postActions": [],
+        "properties": {},
+        "processTimingEnabled": true,
+        "stageLoggingEnabled": true,
+        "stages": [
+            {
+                "name": "Audio Data",
+                "plugin": {
+                    "name": "GCSFile",
+                    "type": "batchsource",
+                    "label": "Audio Data",
+                    "artifact": {
+                        "name": "google-cloud",
+                        "version": "0.12.1",
+                        "scope": "SYSTEM"
+                    },
+                    "properties": {
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"body\",\"type\":\"bytes\"}]}",
+                        "project": "auto-detect",
+                        "format": "blob",
+                        "serviceFilePath": "auto-detect",
+                        "filenameOnly": "false",
+                        "recursive": "false",
+                        "referenceName": "speech",
+                        "path": "gs://speech-to-text-hackathon/sample.wav"
+                    }
+                },
+                "outputSchema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"body\",\"type\":\"bytes\"}]}",
+                "type": "batchsource",
+                "label": "Audio Data",
+                "icon": "fa-plug",
+                "$$hashKey": "object:1137",
+                "_uiPosition": {
+                    "left": "368px",
+                    "top": "227px"
+                }
+            },
+            {
+                "name": "Google Cloud Speech-to-Text",
+                "plugin": {
+                    "name": "SpeechToText",
+                    "type": "transform",
+                    "label": "Google Cloud Speech-to-Text",
+                    "artifact": {
+                        "name": "google-cloud",
+                        "version": "0.12.1",
+                        "scope": "SYSTEM"
+                    },
+                    "properties": {
+                        "encoding": "LINEAR16",
+                        "profanity": "false",
+                        "language": "en-US",
+                        "transcriptionTextField": "transcript",
+                        "serviceFilePath": "auto-detect",
+                        "audiofield": "body",
+                        "samplerate": "44100"
+                    }
+                },
+                "outputSchema": [
+                    {
+                        "name": "etlSchemaBody",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"transcript\",\"type\":\"string\"}]}"
+                    }
+                ],
+                "inputSchema": [
+                    {
+                        "name": "Audio Data",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"body\",\"type\":\"bytes\"}]}"
+                    }
+                ],
+                "type": "transform",
+                "label": "Google Cloud Speech-to-Text",
+                "icon": "fa-plug",
+                "$$hashKey": "object:1138",
+                "_uiPosition": {
+                    "left": "668px",
+                    "top": "227px"
+                }
+            },
+            {
+                "name": "Text Data",
+                "plugin": {
+                    "name": "GCS",
+                    "type": "batchsink",
+                    "label": "Text Data",
+                    "artifact": {
+                        "name": "google-cloud",
+                        "version": "0.12.1",
+                        "scope": "SYSTEM"
+                    },
+                    "properties": {
+                        "project": "auto-detect",
+                        "format": "csv",
+                        "serviceFilePath": "auto-detect",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"transcript\",\"type\":\"string\"}]}",
+                        "referenceName": "text",
+                        "path": "gs://speech-to-text-hackathon/result",
+                        "suffix": "2019"
+                    }
+                },
+                "outputSchema": [
+                    {
+                        "name": "etlSchemaBody",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"transcript\",\"type\":\"string\"}]}"
+                    }
+                ],
+                "inputSchema": [
+                    {
+                        "name": "Google Cloud Speech-to-Text",
+                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"transcript\",\"type\":\"string\"}]}"
+                    }
+                ],
+                "type": "batchsink",
+                "label": "Text Data",
+                "icon": "fa-plug",
+                "$$hashKey": "object:1139",
+                "_uiPosition": {
+                    "left": "968px",
+                    "top": "227px"
+                }
+            }
+        ],
+        "schedule": "0 * * * *",
+        "engine": "mapreduce",
+        "numOfRecordsPreview": 100,
+        "description": "Data Pipeline Application",
+        "maxConcurrentRuns": 1
+    }
+}
