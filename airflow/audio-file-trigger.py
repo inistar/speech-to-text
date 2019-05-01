@@ -4,7 +4,6 @@ from airflow import DAG
 from airflow.operators import PythonOperator
 from airflow.operators.http_operator import SimpleHttpOperator
 from airflow.operators.bash_operator import BashOperator
-# from airflow.contrib.sensors import GoogleCloudStorageObjectSensor
 from airflow_gcs_sensor import GoogleCloudStorageObjectSensor
 
 CONN_ID = "gcp_conn"
@@ -30,9 +29,9 @@ dag = DAG(
 trigger = GoogleCloudStorageObjectSensor(
     task_id='sensor',
     bucket='datahawks-storage',
-    object='temp/test.txt',
+    object='temp/sample.wav',
     google_cloud_conn_id=CONN_ID,
-    timeout=120,
+    timeout=1000,
     dag=dag
 )
 
@@ -40,12 +39,8 @@ start_pipeline = SimpleHttpOperator(
     task_id='start_pipeline',
     method='POST',
     http_conn_id=CDAP_CONN,
-    endpoint='v3/namespaces/default/apps/simple/workflows/DataPipelineWorkflow/start',
-    headers={"Authorization": "Bearer AghjZGFwAIbvupbOWobf7ejOWuKswJcEQPaX111wfooSTr/gUo4dZdWJLvcDKSnZduuXpytWSJoJ"},
+    endpoint='v3/namespaces/default/apps/SpeechToText/workflows/DataPipelineWorkflow/start',
+    headers={"Authorization": "Bearer AghjZGFwAJiFr5zOWpj14e7OWriaw50BQNKhhN8CQW0S2ds6Z/Tsnht74ei6EqKLHuXyIcMzb9q3"},
     dag=dag)
-
-# notify = BashOperator(task_id='case_false', 
-#                         bash_command='echo done',
-#                         dag=dag)
 
 trigger >> start_pipeline
