@@ -1,0 +1,7 @@
+
+
+GET status
+CURL http://104.155.164.61:11015/v3/namespaces/default/apps/simple/workflows/DataPipelineWorkflow/status -H 'Authorization: Bearer AghjZGFwAIbvupbOWobf7ejOWuKswJcEQPaX111wfooSTr/gUo4dZdWJLvcDKSnZduuXpytWSJoJ'
+
+POST start pipeline job
+CURL -X POST http://104.155.164.61:11015/v3/namespaces/default/apps/simple/workflows/DataPipelineWorkflow/start -H 'Authorization: Bearer AghjZGFwAIbvupbOWobf7ejOWuKswJcEQPaX111wfooSTr/gUo4dZdWJLvcDKSnZduuXpytWSJoJ'
