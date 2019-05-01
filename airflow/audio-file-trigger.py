@@ -4,6 +4,8 @@ from airflow import DAG
 from airflow.operators import PythonOperator
 from airflow.operators.http_operator import SimpleHttpOperator
 from airflow.operators.bash_operator import BashOperator
+# from airflow.contrib.sensors import GoogleCloudStorageObjectSensor
+from airflow_gcs_sensor import GoogleCloudStorageObjectSensor
 
 CONN_ID = "gcp_conn"
 CDAP_CONN = "CDAP_conn"
@@ -25,7 +27,16 @@ dag = DAG(
     schedule_interval="@once"
 )
 
-T1 = SimpleHttpOperator(
+trigger = GoogleCloudStorageObjectSensor(
+    task_id='sensor',
+    bucket='datahawks-storage',
+    object='temp/test.txt',
+    google_cloud_conn_id=CONN_ID,
+    timeout=120,
+    dag=dag
+)
+
+start_pipeline = SimpleHttpOperator(
     task_id='start_pipeline',
     method='POST',
     http_conn_id=CDAP_CONN,
@@ -33,9 +44,8 @@ T1 = SimpleHttpOperator(
     headers={"Authorization": "Bearer AghjZGFwAIbvupbOWobf7ejOWuKswJcEQPaX111wfooSTr/gUo4dZdWJLvcDKSnZduuXpytWSJoJ"},
     dag=dag)
 
-# start_cmd = "CURL http://104.155.164.61:11015/v3/namespaces/default/apps/simple/workflows/DataPipelineWorkflow/status -H 'Authorization: Bearer AghjZGFwAIbvupbOWobf7ejOWuKswJcEQPaX111wfooSTr/gUo4dZdWJLvcDKSnZduuXpytWSJoJ'"
-# start_pipeline = BashOperator(task_id='start_pipeline', 
-#                         bash_command=start_cmd,
+# notify = BashOperator(task_id='case_false', 
+#                         bash_command='echo done',
 #                         dag=dag)
 
-T1
+trigger >> start_pipeline
