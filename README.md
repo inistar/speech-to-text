@@ -1,2 +1,7 @@
-# speech-to-text
-Convert Speech into text.
+# Speech to Text Using CDAP
+
+CDAP is a data integration service that allows users to create complex pipelines without having any kind of programming experience. It also supports migrating data in a hybrid or multi-cloud environment. 
+
+Cloud Composer is fully managed workflow orchestration service built on Apache Airflow. CDAP also provides its own scheduler to kick off pipelines, but it is very simple as running cron jobs. Airflow provides a more sophisticated scheduling system such as handling dependencies, keeping track of historical jobs, passing parameters from one task to another, handling failures, integration with cloud services and triggering an instance using data sensors. 
+
+The above architecture illustrates the design for converting audio files from speech to text. The Python audio recorder uses PyAudio library to record users voice. The voice is recorded as a .wav file and uploaded into Google Cloud Storage bucket. The Apache Airflow sensor operator detects when a new file has been uploaded into the bucket. This can trigger the CDAP pipeline job using CDAP’s HTTP RESTful API. The CDAP pipeline in this case has a GCS source bucket where the .wav files are being uploaded. From the source, the data is passed into Cloud Speech-to-Text to convert the audio files into transcripts. The results are then stored back into GCS bucket. The sources and sinks of the pipeline can be easily be changed to relational DB, OnPrem files, kafka streams, etc. There can be steps that can be added in between to do additional data wrangling and transformations to enrich the data.

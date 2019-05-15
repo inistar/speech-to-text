@@ -4,20 +4,20 @@ from google.cloud import storage
 import pandas as pd
 
 # Environment Variable
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'E:\\GCP\\hackstaticboss\\Service Account Key\\hackathon-springml-2019.json'
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'E:\\GCP\\hackstaticboss\\Service Account Key\\key.json'
 
 # GCS Bucket Properties
-bucket_name = 'speech-to-text-hackathon'
+bucket_name = 'datahawks-storage'
 source_blob_name = 'result/2019/part-m-00000'
 destination_file_name = 'E:\\text.csv'
-blob_name = 'result/2019'
+# blob_name = 'result/2019'
 
 # Local Downloaded CSV File Properties
 csv_file = 'E:\\text.csv'
 
 
 def download_file(bucket_name, source_blob_name, destination_file_name):
-    """Downloads a blob from the bucket."""
+    # Downloads a blob from the bucket.
     storage_client = storage.Client()
     bucket = storage_client.get_bucket(bucket_name)
     blob = bucket.blob(source_blob_name)
@@ -30,15 +30,15 @@ def download_file(bucket_name, source_blob_name, destination_file_name):
 
 
 # This function deletes the folder where the text data is stored.
-def delete_blob(bucket_name, blob_name):
-    """Deletes a blob from the bucket."""
-    storage_client = storage.Client()
-    bucket = storage_client.get_bucket(bucket_name)
-    blobs = bucket.list_blobs(prefix='result/2019')
-    for blob in blobs:
-        blob.delete()
-
-    print('Blob {} deleted.'.format(blob_name))
+# def delete_blob(bucket_name, blob_name):
+#     """Deletes a blob from the bucket."""
+#     storage_client = storage.Client()
+#     bucket = storage_client.get_bucket(bucket_name)
+#     blobs = bucket.list_blobs(prefix='result/2019')
+#     for blob in blobs:
+#         blob.delete()
+#
+#     print('Blob {} deleted.'.format(blob_name))
 
 
 # CSV to Text Function
@@ -50,5 +50,5 @@ def csv_to_text(csv_file):
 
 # Function Call
 download_file(bucket_name, source_blob_name, destination_file_name)
-delete_blob(bucket_name, blob_name)
+# delete_blob(bucket_name, blob_name)
 csv_to_text(csv_file)

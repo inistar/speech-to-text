@@ -5,10 +5,10 @@ import pyaudio
 import wave
 
 # Environment Variable
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'E:\\GCP\\hackstaticboss\\Service Account Key\\hackathon-springml-2019.json'
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'E:\\GCP\\hackstaticboss\\Service Account Key\\key.json'
 
 # GCS Bucket Properties
-bucket_name = 'speech-to-text-hackathon'
+bucket_name = 'datahawks-storage'
 source_file_name = 'E:\\file.wav'
 destination_blob_name = 'sample.wav'
 

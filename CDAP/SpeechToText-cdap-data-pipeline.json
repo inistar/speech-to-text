@@ -1,11 +1,11 @@
 {
-    "name": "SpeechToText",
-    "description": "Data Pipeline Application",
     "artifact": {
         "name": "cdap-data-pipeline",
-        "version": "6.0.0",
+        "version": "5.1.2",
         "scope": "SYSTEM"
     },
+    "description": "Data Pipeline Application",
+    "name": "SpeechToText",
     "config": {
         "resources": {
             "memoryMB": 2048,
@@ -23,6 +23,10 @@
             {
                 "from": "Google Cloud Speech-to-Text",
                 "to": "Text Data"
+            },
+            {
+                "from": "Text Data",
+                "to": "Delete Audio File"
             }
         ],
         "comments": [],
@@ -39,7 +43,7 @@
                     "label": "Audio Data",
                     "artifact": {
                         "name": "google-cloud",
-                        "version": "0.12.1",
+                        "version": "0.11.2",
                         "scope": "SYSTEM"
                     },
                     "properties": {
@@ -50,18 +54,10 @@
                         "filenameOnly": "false",
                         "recursive": "false",
                         "referenceName": "speech",
-                        "path": "gs://speech-to-text-hackathon/sample.wav"
+                        "path": "gs://datahawks-storage/sample.wav"
                     }
                 },
-                "outputSchema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"body\",\"type\":\"bytes\"}]}",
-                "type": "batchsource",
-                "label": "Audio Data",
-                "icon": "fa-plug",
-                "$$hashKey": "object:1137",
-                "_uiPosition": {
-                    "left": "368px",
-                    "top": "227px"
-                }
+                "outputSchema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"body\",\"type\":\"bytes\"}]}"
             },
             {
                 "name": "Google Cloud Speech-to-Text",
@@ -71,7 +67,7 @@
                     "label": "Google Cloud Speech-to-Text",
                     "artifact": {
                         "name": "google-cloud",
-                        "version": "0.12.1",
+                        "version": "0.11.2",
                         "scope": "SYSTEM"
                     },
                     "properties": {
@@ -95,15 +91,7 @@
                         "name": "Audio Data",
                         "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"body\",\"type\":\"bytes\"}]}"
                     }
-                ],
-                "type": "transform",
-                "label": "Google Cloud Speech-to-Text",
-                "icon": "fa-plug",
-                "$$hashKey": "object:1138",
-                "_uiPosition": {
-                    "left": "668px",
-                    "top": "227px"
-                }
+                ]
             },
             {
                 "name": "Text Data",
@@ -113,7 +101,7 @@
                     "label": "Text Data",
                     "artifact": {
                         "name": "google-cloud",
-                        "version": "0.12.1",
+                        "version": "0.11.2",
                         "scope": "SYSTEM"
                     },
                     "properties": {
@@ -122,30 +110,41 @@
                         "serviceFilePath": "auto-detect",
                         "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"transcript\",\"type\":\"string\"}]}",
                         "referenceName": "text",
-                        "path": "gs://speech-to-text-hackathon/result",
+                        "path": "gs://datahawks-storage/result/",
                         "suffix": "2019"
                     }
                 },
-                "outputSchema": [
-                    {
-                        "name": "etlSchemaBody",
-                        "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"transcript\",\"type\":\"string\"}]}"
-                    }
-                ],
+                "outputSchema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"transcript\",\"type\":\"string\"}]}",
                 "inputSchema": [
                     {
                         "name": "Google Cloud Speech-to-Text",
                         "schema": "{\"type\":\"record\",\"name\":\"etlSchemaBody\",\"fields\":[{\"name\":\"transcript\",\"type\":\"string\"}]}"
                     }
-                ],
-                "type": "batchsink",
-                "label": "Text Data",
-                "icon": "fa-plug",
-                "$$hashKey": "object:1139",
-                "_uiPosition": {
-                    "left": "968px",
-                    "top": "227px"
-                }
+                ]
+            },
+            {
+                "name": "Delete Audio File",
+                "plugin": {
+                    "name": "GCSBucketDelete",
+                    "type": "action",
+                    "label": "Delete Audio File",
+                    "artifact": {
+                        "name": "google-cloud",
+                        "version": "0.11.2",
+                        "scope": "SYSTEM"
+                    },
+                    "properties": {
+                        "project": "auto-detect",
+                        "serviceFilePath": "auto-detect",
+                        "paths": "datahawks-storage/sample.wav"
+                    }
+                },
+                "outputSchema": [
+                    {
+                        "name": "etlSchemaBody",
+                        "schema": ""
+                    }
+                ]
             }
         ],
         "schedule": "0 * * * *",
